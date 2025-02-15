@@ -1,4 +1,4 @@
-module github.com/ogiusek/go_wshub/v1
+module github.com/ogiusek/go_wshub
 
 go 1.22.6
 
