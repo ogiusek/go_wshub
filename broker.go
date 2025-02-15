@@ -8,14 +8,14 @@ package wshub
 
 // listens for message from broker
 type BrokerListener[Message any] interface {
-	Listen(listener func(Message))
+	listen(listener func(Message))
 }
 
 type brokerListenerImpl[Message any] struct {
 	listeners []func(Message)
 }
 
-func (impl *brokerListenerImpl[Message]) Listen(listener func(Message)) {
+func (impl *brokerListenerImpl[Message]) listen(listener func(Message)) {
 	impl.listeners = append(impl.listeners, listener)
 }
 
@@ -35,14 +35,14 @@ func NewBrokerListener[Message any]() (brokerListener BrokerListener[Message], i
 
 // sends message to broker
 type BrokerSender[Message any] interface {
-	Send(message Message)
+	send(message Message)
 }
 
 type brokerSenderImpl[Message any] struct {
 	receive func(message Message)
 }
 
-func (impl *brokerSenderImpl[Message]) Send(message Message) {
+func (impl *brokerSenderImpl[Message]) send(message Message) {
 	impl.receive(message)
 }
 

@@ -21,14 +21,14 @@ func NewWsHub(broker *broker) WsHub {
 	storage := newSocketStorage()
 	awaiter := newAwaiter[ConnectConfirmation]()
 
-	broker.ConnectConfirmation.Listen(func(connectConfirmation ConnectConfirmation) {
+	broker.ConnectConfirmation.listen(func(connectConfirmation ConnectConfirmation) {
 		err := awaiter.Resolve(connectConfirmation.SocketId, connectConfirmation)
 		if err == ErrIdIsMissing {
-			broker.Closed.Send(NewClose(connectConfirmation.SocketId))
+			broker.Closed.send(NewClose(connectConfirmation.SocketId))
 		}
 	})
 
-	broker.Respond.Listen(func(m SocketMessage) {
+	broker.Respond.listen(func(m SocketMessage) {
 		conn, ok := storage.Get(m.SocketId)
 		if !ok {
 			return
@@ -37,7 +37,7 @@ func NewWsHub(broker *broker) WsHub {
 		conn.Send(payload)
 	})
 
-	broker.Close.Listen(func(c Close) {
+	broker.Close.listen(func(c Close) {
 		socket, ok := storage.Get(c.SocketId)
 		if !ok {
 			return
@@ -46,11 +46,11 @@ func NewWsHub(broker *broker) WsHub {
 	})
 
 	storage.OnClose(func(id id) {
-		broker.Closed.Send(NewClose(id))
+		broker.Closed.send(NewClose(id))
 	})
 
 	storage.OnMessage(func(id id, payload []byte) {
-		broker.Received.Send(NewSocketMessage(id, payload))
+		broker.Received.send(NewSocketMessage(id, payload))
 	})
 
 	return &wshub{
@@ -63,7 +63,7 @@ func NewWsHub(broker *broker) WsHub {
 func (app *wshub) Connect(resolveConn func() SocketConn, payload any) {
 	id := NewSocketId()
 
-	app.broker.ConnectRequest.Send(ConnectRequest{
+	app.broker.ConnectRequest.send(ConnectRequest{
 		SocketId: id,
 		Payload:  payload,
 	})
