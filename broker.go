@@ -7,7 +7,7 @@ package wshub
 // broker listener
 
 // listens for message from broker
-type brokerListener[Message any] interface {
+type BrokerListener[Message any] interface {
 	Listen(listener func(Message))
 }
 
@@ -19,14 +19,14 @@ func (impl *brokerListenerImpl[Message]) Listen(listener func(Message)) {
 	impl.listen(listener)
 }
 
-func NewBrokerListener[Message any](listen func(listener func(Message))) brokerListener[Message] {
+func NewBrokerListener[Message any](listen func(listener func(Message))) BrokerListener[Message] {
 	return &brokerListenerImpl[Message]{listen}
 }
 
 // broker sender
 
 // sends message to broker
-type brokerSender[Message any] interface {
+type BrokerSender[Message any] interface {
 	Send(message Message)
 }
 
@@ -38,7 +38,7 @@ func (impl *brokerSenderImpl[Message]) Send(message Message) {
 	impl.send(message)
 }
 
-func NewBrokerSender[Message any](send func(Message)) brokerSender[Message] {
+func NewBrokerSender[Message any](send func(Message)) BrokerSender[Message] {
 	return &brokerSenderImpl[Message]{send}
 }
 
@@ -46,32 +46,32 @@ func NewBrokerSender[Message any](send func(Message)) brokerSender[Message] {
 
 type broker struct {
 	// is sent by broker when started to ensure all sockets are removed
-	Started brokerSender[Started]
+	Started BrokerSender[Started]
 	// sends to broker after receiving
-	ConnectRequest brokerSender[ConnectRequest]
+	ConnectRequest BrokerSender[ConnectRequest]
 	// connects web socket
-	ConnectConfirmation brokerListener[ConnectConfirmation]
+	ConnectConfirmation BrokerListener[ConnectConfirmation]
 
 	// sends to broker after receiving socket message
-	Received brokerSender[SocketMessage]
+	Received BrokerSender[SocketMessage]
 
 	// after being received sends this to user
-	Respond brokerListener[SocketMessage]
+	Respond BrokerListener[SocketMessage]
 
 	// after being received closes socket
-	Close brokerListener[Close]
+	Close BrokerListener[Close]
 	// sends to broker after closing socket
-	Closed brokerSender[Close]
+	Closed BrokerSender[Close]
 }
 
 func NewBroker(
-	Started brokerSender[Started],
-	ConnectRequest brokerSender[ConnectRequest],
-	ConnectConfirmation brokerListener[ConnectConfirmation],
-	Received brokerSender[SocketMessage],
-	Respond brokerListener[SocketMessage],
-	Close brokerListener[Close],
-	Closed brokerSender[Close],
+	Started BrokerSender[Started],
+	ConnectRequest BrokerSender[ConnectRequest],
+	ConnectConfirmation BrokerListener[ConnectConfirmation],
+	Received BrokerSender[SocketMessage],
+	Respond BrokerListener[SocketMessage],
+	Close BrokerListener[Close],
+	Closed BrokerSender[Close],
 ) *broker {
 	return &broker{
 		Started,
