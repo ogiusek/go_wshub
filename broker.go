@@ -12,15 +12,23 @@ type BrokerListener[Message any] interface {
 }
 
 type brokerListenerImpl[Message any] struct {
-	listen func(listener func(Message))
+	listeners []func(Message)
 }
 
 func (impl *brokerListenerImpl[Message]) Listen(listener func(Message)) {
-	impl.listen(listener)
+	impl.listeners = append(impl.listeners, listener)
 }
 
-func NewBrokerListener[Message any](listen func(listener func(Message))) BrokerListener[Message] {
-	return &brokerListenerImpl[Message]{listen}
+func NewBrokerListener[Message any]() (brokerListener BrokerListener[Message], invoke func(Message)) {
+	listeners := &brokerListenerImpl[Message]{
+		listeners: []func(Message){},
+	}
+
+	return listeners, func(m Message) {
+		for _, listener := range listeners.listeners {
+			listener(m)
+		}
+	}
 }
 
 // broker sender
@@ -31,15 +39,15 @@ type BrokerSender[Message any] interface {
 }
 
 type brokerSenderImpl[Message any] struct {
-	send func(message Message)
+	receive func(message Message)
 }
 
 func (impl *brokerSenderImpl[Message]) Send(message Message) {
-	impl.send(message)
+	impl.receive(message)
 }
 
-func NewBrokerSender[Message any](send func(Message)) BrokerSender[Message] {
-	return &brokerSenderImpl[Message]{send}
+func NewBrokerSender[Message any](receive func(Message)) BrokerSender[Message] {
+	return &brokerSenderImpl[Message]{receive: receive}
 }
 
 // broker
