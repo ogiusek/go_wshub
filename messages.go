@@ -10,11 +10,22 @@ package wshub
 
 type Started struct{}
 
+func NewStarted() Started {
+	return Started{}
+}
+
 // connect confirmation
 
 type ConnectConfirmation struct {
 	SocketId   id   `json:"socket_id"`
 	CanConnect bool `json:"can_connect"`
+}
+
+func NewConnectConfirmation(socketId id, canConnect bool) ConnectConfirmation {
+	return ConnectConfirmation{
+		SocketId:   socketId,
+		CanConnect: canConnect,
+	}
 }
 
 // connect request
