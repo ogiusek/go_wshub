@@ -1,6 +1,10 @@
 package wshub
 
-import "github.com/google/uuid"
+import (
+	"encoding/json"
+
+	"github.com/google/uuid"
+)
 
 // id
 // socket conn
@@ -8,6 +12,14 @@ import "github.com/google/uuid"
 // id
 
 type id struct{ value string }
+
+func (u id) MarshalJSON() ([]byte, error) {
+	return json.Marshal(u.value)
+}
+
+func (u *id) UnmarshalJSON(data []byte) error {
+	return json.Unmarshal(data, &u.value)
+}
 
 func NewSocketId() id {
 	return id{value: uuid.NewString()}
