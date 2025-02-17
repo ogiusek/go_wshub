@@ -31,19 +31,19 @@ func NewConnectConfirmation(socketId id, canConnect bool) ConnectConfirmation {
 // connect request
 
 type ConnectRequest struct {
-	SocketId id  `json:"socket_id"`
-	Payload  any `json:"info"`
+	SocketId id     `json:"socket_id"`
+	Payload  []byte `json:"info"`
 }
 
-func NewConnectRequest(id id, payload any) ConnectRequest {
+func NewConnectRequest(id id, payload []byte) ConnectRequest {
 	return ConnectRequest{SocketId: id, Payload: payload}
 }
 
 // message
 
 type SocketMessage struct {
-	SocketId id  `json:"socket_id"`
-	Payload  any `json:"payload"`
+	SocketId id     `json:"socket_id"`
+	Payload  []byte `json:"payload"`
 }
 
 func NewSocketMessage(id id, payload []byte) SocketMessage {

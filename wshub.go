@@ -1,12 +1,12 @@
 package wshub
 
 import (
-	"encoding/json"
 	"log"
 )
 
 type WsHub interface {
-	Connect(resolveConn func() SocketConn, payload any)
+	// Connect runs until connection is closed/rejected
+	Connect(approve func() SocketConn, payload []byte)
 }
 
 type wshub struct {
@@ -34,8 +34,7 @@ func NewWsHub(broker *broker) WsHub {
 		if !ok {
 			return
 		}
-		payload, _ := json.Marshal(m.Payload)
-		conn.Send(payload)
+		conn.Send(m.Payload)
 	})
 
 	broker.close.listen(func(c Close) {
@@ -61,7 +60,7 @@ func NewWsHub(broker *broker) WsHub {
 	}
 }
 
-func (app *wshub) Connect(resolveConn func() SocketConn, connectRequestPayload any) {
+func (app *wshub) Connect(resolveConn func() SocketConn, connectRequestPayload []byte) {
 	id := NewSocketId()
 
 	app.broker.connectRequest.send(ConnectRequest{
