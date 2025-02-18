@@ -11,22 +11,26 @@ import (
 
 // id
 
-type id struct{ value string }
+type Id struct{ value string }
 
-func (u id) MarshalJSON() ([]byte, error) {
+func (u Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(u.value)
 }
 
-func (u *id) UnmarshalJSON(data []byte) error {
+func (u *Id) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &u.value)
 }
 
-func NewSocketId() id {
-	return id{value: uuid.NewString()}
+func (u *Id) String() string {
+	return u.value
 }
 
-func SocketIdFrom(value string) id {
-	return id{value: value}
+func NewSocketId() Id {
+	return Id{value: uuid.NewString()}
+}
+
+func SocketIdFrom(value string) Id {
+	return Id{value: value}
 }
 
 // socket conn

@@ -45,11 +45,11 @@ func NewWsHub(broker *broker) WsHub {
 		socket.Close()
 	})
 
-	storage.OnClose(func(id id) {
+	storage.OnClose(func(id Id) {
 		broker.closed.send(NewClose(id))
 	})
 
-	storage.OnMessage(func(id id, payload []byte) {
+	storage.OnMessage(func(id Id, payload []byte) {
 		broker.received.send(NewSocketMessage(id, payload))
 	})
 
