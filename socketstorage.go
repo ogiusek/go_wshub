@@ -8,23 +8,23 @@ import (
 
 type socketStorage struct {
 	mux              *sync.Mutex
-	sockets          map[Id]SocketConn
-	connectListeners []func(Id)
-	messageListeners []func(Id, []byte)
-	closeListeners   []func(Id)
+	sockets          map[id]SocketConn
+	connectListeners []func(id)
+	messageListeners []func(id, []byte)
+	closeListeners   []func(id)
 }
 
 func newSocketStorage() *socketStorage {
 	return &socketStorage{
 		mux:              &sync.Mutex{},
-		sockets:          map[Id]SocketConn{},
-		connectListeners: []func(Id){},
-		messageListeners: []func(Id, []byte){},
-		closeListeners:   []func(Id){},
+		sockets:          map[id]SocketConn{},
+		connectListeners: []func(id){},
+		messageListeners: []func(id, []byte){},
+		closeListeners:   []func(id){},
 	}
 }
 
-func (storage *socketStorage) run(id Id, conn SocketConn) error {
+func (storage *socketStorage) run(id id, conn SocketConn) error {
 	defer conn.Close()
 
 	storage.mux.Lock()
@@ -60,19 +60,19 @@ func (storage *socketStorage) run(id Id, conn SocketConn) error {
 	return nil
 }
 
-func (sockets *socketStorage) OnConnect(listener func(id Id)) {
+func (sockets *socketStorage) OnConnect(listener func(id id)) {
 	sockets.connectListeners = append(sockets.connectListeners, listener)
 }
 
-func (sockets *socketStorage) OnMessage(listener func(id Id, payload []byte)) {
+func (sockets *socketStorage) OnMessage(listener func(id id, payload []byte)) {
 	sockets.messageListeners = append(sockets.messageListeners, listener)
 }
 
-func (sockets *socketStorage) OnClose(listener func(id Id)) {
+func (sockets *socketStorage) OnClose(listener func(id id)) {
 	sockets.closeListeners = append(sockets.closeListeners, listener)
 }
 
-func (storage *socketStorage) Get(id Id) (conn SocketConn, ok bool) {
+func (storage *socketStorage) Get(id id) (conn SocketConn, ok bool) {
 	_conn, _ok := storage.sockets[id]
 	return _conn, _ok
 }
